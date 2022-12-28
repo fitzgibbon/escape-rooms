@@ -1,0 +1,26 @@
+* Ryan & Zoe Hag Escape Room
+** Flow
+#+begin_src mermaid :file flow.svg
+graph TD
+    piece-1("♞ D4")
+    piece-2("♛ D6")
+    piece-3("♙ G2")
+    piece-4("♖ F1")
+    piece-5("♔ G1")
+    chess[[Chess checkmate puzzle. Black to move, mate in 3.]]
+    piece-1 --> chess
+    piece-2 --> chess
+    piece-3 --> chess
+    piece-4 --> chess
+    piece-5 --> chess
+    chess-code{{E2 H1 H2 H5}}
+    chess --> chess-code
+#+end_src
+
+#+RESULTS:
+[[file:flow.svg]]
+
+** Puzzles
+** Props
+** Tech
+** Actors
