@@ -2,25 +2,222 @@
 ** Flow
 #+begin_src mermaid :file flow.svg
 graph TD
-    piece-1("♞ D4")
-    piece-2("♛ D6")
-    piece-3("♙ G2")
-    piece-4("♖ F1")
-    piece-5("♔ G1")
-    chess[[Chess checkmate puzzle. Black to move, mate in 3.]]
-    piece-1 --> chess
-    piece-2 --> chess
-    piece-3 --> chess
-    piece-4 --> chess
-    piece-5 --> chess
-    chess-code{{E2 H1 H2 H5}}
-    chess --> chess-code
+    classDef hidden stroke-dasharray: 5 5
+    classDef todo stroke: #c44, fill: #c44    
+
+    subgraph legend[Legend]
+        legend-physical>Physical object]
+        legend-hidden>Hidden object]:::hidden
+        legend-information(Information)
+        legend-action{{Action}}
+    end
+
+    toolbox>Black and yellow toolbox] --> open-toolbox{{Open the toolbox}} --> map-with-blackhorse-road & green-string
+    black-lock>Black code lock] --> unlock-black-lock{{Unlock the black combination lock}} --> open-toolbox
+    black-code(Black code) --> unlock-black-lock
+    toolbox -- in unlocked compartment --> todo1:::todo
+
+    lockbox>Black metal lockbox]:::hidden --> unlock-lockbox{{Unlock black metal lockbox with key}} -- under cash insert --> caesar-1-letter
+    lockbox-key>Key to black metal lockbox]:::hidden --> unlock-lockbox -- on top --> iphone-security-memo
+    unlock-lockbox -- in cash drawer --> chesspiece
+
+    suitcase>Small brown suitcase] & suitcase-code(451) --> unlock-suitcase{{Unlock the suitcase}} --> android & spot>Spot the dog] & caesar-2-letter
+
+    piece-1("♞ D4") --> chess
+    piece-2("♛ D6") --> chess
+    piece-3("♙ G2") --> chess
+    piece-4("♖ F1") --> chess
+    piece-5("♔ G1") --> chess
+    chess{{Solve mate in 3, black to move}} --> chess-code(E2 H1 H2 H5)
+
+    chessboard>Chess board] & preplaced-chesspieces>Preplaced chesspieces] & chess-notes>Chess puzzle notes] --> chess
+
+    chesspiece>Tagged chesspiece] --> piece-2
+
+    iphone>Locked iPhone]:::hidden --> unlock-iphone{{Unlock iPhone}} --> iphone-wallpaper>iPhone porn wallpaper with G2 superimposed] --> piece-3
+    iphone-unlock-code(iPhone unlock code) --> unlock-iphone
+    iphone-security-memo>iPhone security policy memo] --> deduce-iphone-code{{Logically deduce unlock code}} --> iphone-unlock-code
+
+    android>Locked, occasionally ringing, Android phone] --> unlock-android{{Unlock Android phone}} --> todo2:::todo
+    mirrored-tape-pattern>Tape pattern in mirror] --> android-unlock-pattern(Android unlock pattern) --> unlock-android    
+    android -- in back of phone case --> string-orange
+
+    codewheel>Caesar 1 codewheel]:::hidden --> caesar-1-key(Caesar 1 key) --> decode-caesar-1{{Decode Caesar 1}}
+    caesar-1-letter>Crumpled coded letter]:::hidden --> caesar-1-ciphertext(Caesar 1 ciphertext) --> decode-caesar-1 --> suitcase-code
+
+    caesar-2-letter>Another crumpled coded letter] --> decode-caesar-2{{Decode Caesar 2 with known plaintext}} --> piece-5
+
+    cat-paintings>Cat paintings] --> order-cats-by-age{{Order cats by age}} --> black-code
+    cat-clue-1>Cat clue 1] --> order-cats-by-age
+    cat-clue-2>Cat clue 2]:::hidden --> order-cats-by-age
+    cat-clue-3>Cat clue 3]:::hidden --> order-cats-by-age
+    cat-clue-4>Cat clue 4]:::hidden --> order-cats-by-age
+
+    map-with-blackhorse-road>Blackhorse Road Triangulation Map with D4 on reverse] --> triangulate-blackhorse-road{{Triangulate Blackhorse Road}} --> piece-1
+    string-green>Green string] --> triangulate-blackhorse-road    
+    string-blue>Blue string]:::hidden --> triangulate-blackhorse-road
+    string-orange>Red string]:::hidden --> triangulate-blackhorse-road
+
+    classDef done stroke: #4c4
+    class lockbox,lockbox-key,chessboard,preplaced-chesspieces done;
+
+    class iphone-security-memo todo;    
 #+end_src
 
 #+RESULTS:
 [[file:flow.svg]]
 
 ** Puzzles
+*** Chess
+*** Simultaneous equations
+*** Cat deduction
+**** Solution
+| Name          | Fur           | Clothing               | Position (left to right) |
+|---------------+---------------+------------------------+--------------------------|
+| Pugh I        | Ginger        | Pink collar            |                        1 |
+| Pugh II       | Ginger        | Blue jacket            |                        2 |
+| Barney McGrew | Black         | Green bowtie           |                        3 |
+| Cuthbert      | Tortoiseshell | Yellow and blue bonnet |                        4 |
+| Dibble        | Hairless      | White ruff             |                        5 |
+| Grub          | White         | Purple beret           |                        6 |
+**** Deduction grid
+|   | Name | Fur | Collar | Position |
+|---+------+-----+--------+----------|
+|   |      |     |        |          |
+**** Prolog Old
+#+begin_src prolog :goal brother(X, Y), wearing(Y, blue_jacket).
+cat(pugh_i).
+cat(pugh_ii).
+cat(barney_mcgrew).
+cat(cuthbert).
+cat(dibble).
+cat(grub).
+
+fur(pugh_i, ginger).
+fur(pugh_i, ginger).
+fur(barney_mcgre, ginger).
+wearing(pugh_i, pink_collar).
+wearing(pugh_ii, blue_jacket).
+wearing(barney_mcgrew, green_bowtie).
+wearing(cuthbert, yellow_and_blue_bonnet).
+wearing(dibble, white_ruff).
+wearing(grub, purple_beret).
+one_eyed(pugh_ii).
+smiling(pugh_i).
+
+age(pugh_i, 2).
+age(pugh_ii, 9).
+age(barney_mcgrew, 5).
+age(cuthbert, 6).
+age(dibble, 17).
+age(grub, 10).
+
+having_affair_with(X, Y) :- affair(X, Y), affair(Y, X).
+having_affair_with(cuthbert, grub).
+
+brother(X, Y) :- X\==Y, male(X), parent(Z, X), parent(Z, Y).
+brothers(X, Y) :- male(Y), brother(X, Y).
+sister(X, Y) :- X\==Y, female(X), parent(Z, X), parent(Z, Y).
+sisters(X, Y) :- female(Y), sister(X, Y).
+sibling(X, Y) :- brother(X, Y); sister(X, Y).
+
+brothers(pugh_i, pugh_ii).
+#+end_src
+
+#+RESULTS:
+**** Prolog Puzzle
+#+begin_src prolog :session :goal findall(X, alive(X), Solution)
+cat(pugh_i).
+cat(pugh_ii).
+cat(barney_mcgrew).
+cat(cuthbert).
+cat(dibble).
+cat(grub).
+
+fur(pugh_i, ginger).
+fur(pugh_i, ginger).
+fur(barney_mcgre, ginger).
+wearing(pugh_i, pink_collar).
+wearing(pugh_ii, blue_jacket).
+wearing(barney_mcgrew, green_bowtie).
+wearing(cuthbert, yellow_and_blue_bonnet).
+wearing(dibble, white_ruff).
+wearing(grub, purple_beret).
+one_eyed(pugh_ii).
+smiling(pugh_i).
+
+worn_on(pink_collar, neck).
+worn_on(blue_jacket, body).
+worn_on(green_bowtie, neck).
+worn_on(yellow_and_blue_bonnet, head).
+worn_on(white_ruff, neck).
+worn_on(purple_beret, head).
+
+wearing(X, Y), worn_on(Y, head) :- alive(X).
+#+end_src
+
+#+RESULTS:
+: Solution = [pugh_i].
+
+**** Prolog Example Puzzle
+#+begin_src prolog :session :goal votesFor([Cairo, London, Beijing, Moscow, Mumbai, Nairobi, Jakarta])
+count([],_,0).
+count([X,Y|Rest],[X,Y],N) :- count(Rest,[X,Y],N1), N is N1 + 1.
+count([Z|Rest],[X,Y],N) :- Z \= X, count(Rest, [X,Y], N).
+
+votesFor([Cairo, London, Beijing, Moscow, Mumbai, Nairobi, Jakarta]) :-
+    permutation([Cairo, London, Beijing, Moscow, Mumbai, Nairobi, Jakarta],[4,2,2,1,1,0,0]),
+    (Cairo \== Beijing),
+    (Moscow = 4; Moscow = 0),
+    (Cairo > Jakarta),
+    count([Cairo, London, Beijing, Moscow, Mumbai, Nairobi, Jakarta], [0,2], 2),
+    (Jakarta is (London-1); Jakarta is (Beijing-1)).
+#+end_src
+
+#+RESULTS:
+| Cairo = 4         |              |   |
+| London = Moscow   | Moscow = 0   |   |
+| Beijing = Mumbai  | Mumbai = 2   |   |
+| Nairobi = Jakarta | Jakarta = 1. |   |
+
+*** Password logic
+**** Big problem, 2 hours to write probably
+*** Caesar 1
+**** Plaintext
+23-12-1967
+
+SEASONS GREETINGS.
+
+I AM AFRAID THERE HAS BEEN A MIX-UP WITH OUR LUGGAGE. THE CODE FOR MINE IS FOUR FIVE ONE. PLEASE FEED SPOT OR CHRISTMAS IS RUINED. THANKS.
+**** Key
++21
+| ABCDEFGHIJKLMNOPQRSTUVWXYZ |
+|----------------------------|
+| VWXYZABCDEFGHIJKLMNOPQRSTU |
+**** Ciphertext
+23-12-1967
+
+NZVNJIN BMZZODIBN.
+
+D VH VAMVDY OCZMZ CVN WZZI V HDS-PK RDOC JPM GPBBVBZ. OCZ XJYZ AJM HDIZ DN AJPM ADQZ JIZ. KGZVNZ AZZY NKJO JM XCMDNOHVN DN MPDIZY. OCVIFN.
+*** Caesar 2
+**** Plaintext
+1-1-1968
+
+HAPPY NEW YEAR!!!
+
+PLEASE ACCEPT MY APOLOGIES FOR DISTURBING YOUR CHESS GAME ON THE WAY OUT. IF YOU EVER FIND THE WHITE KING THEN HE SHOULD BE ON GOLF ONE. LOOKS LIKE MATE IN THREE WITH BLACK TO MOVE. GOOD LUCK!
+**** Key
++11
+| ABCDEFGHIJKLMNOPQRSTUVWXYZ |
+|----------------------------|
+| LMNOPQRSTUVWXYZABCDEFGHIJK |
+**** Ciphertext
+1-1-1968
+
+SLAAJ YPH JPLC!!!
+
+AWPLDP LNNPAE XJ LAZWZRTPD QZC OTDEFCMTYR JZFC NSPDD RLXP ZY ESP HLJ ZFE. TQ JZF PGPC QTYO ESP HSTEP VTYR ESPY SP DSZFWO MP ZY RZWQ ZYP. WZZVD WTVP XLEP TY ESCPP HTES MWLNV EZ XZGP. RZZO WFNV!
 ** Props
 ** Tech
 ** Actors
