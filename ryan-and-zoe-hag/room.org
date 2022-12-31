@@ -72,14 +72,56 @@ graph TD
 *** Simultaneous equations
 *** Cat deduction
 **** Solution
-| Name          | Fur           | Clothing               | Position (left to right) |
-|---------------+---------------+------------------------+--------------------------|
-| Pugh I        | Ginger        | Pink collar            |                        1 |
-| Pugh II       | Ginger        | Blue jacket            |                        2 |
-| Barney McGrew | Black         | Green bowtie           |                        3 |
-| Cuthbert      | Tortoiseshell | Yellow and blue bonnet |                        4 |
-| Dibble        | Hairless      | White ruff             |                        5 |
-| Grub          | White         | Purple beret           |                        6 |
+| Name          | Fur           | Clothing               | Position (left to right) | Age |
+|---------------+---------------+------------------------+--------------------------+-----|
+| Pugh I        | Ginger        | Blue jacket            |                        1 |  12 |
+| Pugh II       | Ginger        | Pink collar            |                        2 |   6 |
+| Barney McGrew | Black         | Green bowtie           |                        3 |   4 |
+| Cuthbert      | Tortoiseshell | Yellow and blue bonnet |                        4 |   7 |
+| Dibble        | Hairless      | White ruff             |                        5 |   4 |
+| Grub          | White         | Purple beret           |                        6 |  15 |
+**** Clues
+1. All the cats are different ages. The answer you are looking for is the ages of the youngest three cats, in order.
+2. Any cat wearing something on its neck is younger than a cat without something on its neck.
+3. One of the ginger cats is twice the age of the other.
+4. The cats in hats are oldest, with a combined age of 27.
+5. The cat in the ruff is 11.
+6. The cat in the green bowtie is the youngest. His age is divisible by 3.
+**** Prolog check
+#+begin_src prolog :session :goal age([PughI, PughII, BarneyMcGrew, Cuthbert, Dibble, Grub])
+:- use_module(library(clpfd)).
+
+age(Vars) :-
+    Vars = [PughI, PughII, BarneyMcGrew, Cuthbert, Dibble, Grub],
+    (PughI #> 0, PughII #> 0, BarneyMcGrew #> 0, Cuthbert #> 0, Dibble #> 0, Grub #> 0),
+    all_different(Vars),
+    
+    (PughII #< PughI, PughII #< Cuthbert, PughII #< Grub),
+    (BarneyMcGrew #< PughI, BarneyMcGrew #< Cuthbert, BarneyMcGrew #< Grub),
+    (Dibble #< PughI, Dibble #< Cuthbert, Dibble #< Grub),
+
+    ((PughI #= 2 * PughII); (PughII #= 2 * PughI)),
+
+    (Cuthbert #> PughI, Cuthbert #> PughII, Cuthbert #> BarneyMcGrew, Cuthbert #> Dibble),
+    (Grub #> PughI, Grub #> PughII, Grub #> BarneyMcGrew, Grub #> Dibble),
+    (Cuthbert + Grub #= 27),
+
+    (Dibble is 11),
+
+    (BarneyMcGrew #< PughI, BarneyMcGrew #< PughII, BarneyMcGrew #< Cuthbert, BarneyMcGrew #< Dibble, BarneyMcGrew #< Grub),
+    (0 #= mod(BarneyMcGrew, 3)).
+#+end_src
+
+#+RESULTS:
+| PughI              | =  | 12,     |           |     |         |
+| PughII             | =  | 6,      |           |     |         |
+| BarneyMcGrew       | =  | 3,      |           |     |         |
+| Dibble             | =  | 11,     |           |     |         |
+| Cuthbert           | in | 13..14, |           |     |         |
+| all_different([12, | 6, | 3,      | Cuthbert, | 11, | Grub]), |
+| Cuthbert+Grub#=27, |    |         |           |     |         |
+| Grub               | in | 13..14. |           |     |         |
+
 **** Deduction grid
 |   | Name | Fur | Collar | Position |
 |---+------+-----+--------+----------|
@@ -135,10 +177,10 @@ cat(dibble).
 cat(grub).
 
 fur(pugh_i, ginger).
-fur(pugh_i, ginger).
-fur(barney_mcgre, ginger).
-wearing(pugh_i, pink_collar).
-wearing(pugh_ii, blue_jacket).
+fur(pugh_ii, ginger).
+fur(barney_mcgrew, black).
+wearing(pugh_i, blue_jacket).
+wearing(pugh_ii, pink_collar).
 wearing(barney_mcgrew, green_bowtie).
 wearing(cuthbert, yellow_and_blue_bonnet).
 wearing(dibble, white_ruff).
@@ -153,11 +195,30 @@ worn_on(yellow_and_blue_bonnet, head).
 worn_on(white_ruff, neck).
 worn_on(purple_beret, head).
 
-wearing(X, Y), worn_on(Y, head) :- alive(X).
+primary_color(blue_jacket).
+primary_color(yellow_and_blue_bonnet).
+
+dead(X) :- murdered(_, X).
+alive(X) :- \+ dead(X).
+
+%% parent(X, Y).
+%% brother(X, Y).
+%% sister(X, Y).
+%% siblings(X, Y) :- brother(X, Y); brother(Y, X); sister(X, Y); sister(Y, X).
+%% related(X, Y) :- parent(X, Y); parent(Y, X); siblings(X, Y).
+
+%% cats with the same colour fur are directly related
+related(X, Y) :- fur(X, Z), fur(Y, Z).
+
+%% cats collars are younger than cats without
+younger(X, Y) :- wearing(X, Collar), wearing(Y, NotCollar), worn_on(Collar, neck), worn_on(NotCollar, Z), Z \== neck.
+
+murdered(pugh_i, pugh_ii).
+
 #+end_src
 
 #+RESULTS:
-: Solution = [pugh_i].
+: Solution = [].
 
 **** Prolog Example Puzzle
 #+begin_src prolog :session :goal votesFor([Cairo, London, Beijing, Moscow, Mumbai, Nairobi, Jakarta])
